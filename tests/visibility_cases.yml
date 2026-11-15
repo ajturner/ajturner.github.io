@@ -1,0 +1,89 @@
+# Shared cases for the visibility rule in docs/site-contract.md. Both implementations
+# must return `expect` for every case:
+#   _plugins/heo.rb       HEO.visibility        (tests/visibility_test.rb)
+#   scripts/heo/content.py visibility           (tests/test_heo.py)
+# expect: shown | draft (built with a Draft badge, staging only) | dropped
+defaults:
+  user: ajturner
+  excluded_albums: ["999"]
+cases:
+  - name: a post is shown
+    collection: posts
+    data: {}
+    staging: false
+    expect: shown
+  - name: a hidden post is a draft on staging
+    collection: posts
+    data: {hidden: true}
+    staging: true
+    expect: draft
+  - name: a hidden post is dropped on the public site
+    collection: posts
+    data: {hidden: true}
+    staging: false
+    expect: dropped
+  - name: hidden must be literally true
+    collection: talks
+    data: {hidden: "true"}
+    staging: false
+    expect: shown
+  - name: a hidden external article follows the post rule
+    collection: external
+    data: {hidden: true}
+    staging: true
+    expect: draft
+  - name: a photo album is shown
+    collection: photos
+    data: {flickr_id: "123"}
+    staging: false
+    expect: shown
+  - name: a hidden photo album is dropped even on staging
+    collection: photos
+    data: {flickr_id: "123", hidden: true}
+    staging: true
+    expect: dropped
+  - name: an excluded photo album is dropped even on staging
+    collection: photos
+    data: {flickr_id: "999"}
+    staging: true
+    expect: dropped
+  - name: a numeric flickr_id matches the excluded list
+    collection: photos
+    data: {flickr_id: 999}
+    staging: false
+    expect: dropped
+  - name: own repository with the portfolio topic is shown
+    collection: projects
+    data: {github: ajturner/holocene, synced: {topics: [Portfolio, maps]}}
+    staging: false
+    expect: shown
+  - name: own repository without the portfolio topic is dropped even on staging
+    collection: projects
+    data: {github: AJTurner/geopress, synced: {topics: [wordpress]}}
+    staging: true
+    expect: dropped
+  - name: own repository with no synced block is dropped
+    collection: projects
+    data: {github: ajturner/new-thing}
+    staging: false
+    expect: dropped
+  - name: another owner's repository is shown without the topic
+    collection: projects
+    data: {github: koopjs/koop, synced: {topics: []}}
+    staging: false
+    expect: shown
+  - name: a project with no repository is shown
+    collection: projects
+    data: {demo: "https://example.com/"}
+    staging: false
+    expect: shown
+  - name: a hidden project from another owner is a draft on staging
+    collection: projects
+    data: {github: koopjs/koop, hidden: true}
+    staging: true
+    expect: draft
+  - name: the portfolio rule beats hidden for own repositories
+    collection: projects
+    data: {github: ajturner/geopress, hidden: true, synced: {topics: []}}
+    staging: true
+    expect: dropped

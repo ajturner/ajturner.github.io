@@ -9,7 +9,12 @@ layout: default
   <div class="prose">
     {{ content }}
   </div>
-  {%- capture terms %}{{ page.categories | join: " · " }}{% if page.categories.size > 0 and page.tags.size > 0 %} · {% endif %}{{ page.tags | join: " · " }}{% endcapture %}
+  {%- comment %} Each term links to its page from _plugins/terms.rb. {% endcomment -%}
+  {%- capture terms %}
+    {%- for c in page.categories %}{% unless forloop.first %} · {% endunless %}<a href="/articles/category/{{ c | slugify }}/">{{ c }}</a>{% endfor -%}
+    {%- if page.categories.size > 0 and page.tags.size > 0 %} · {% endif -%}
+    {%- for t in page.tags %}{% unless forloop.first %} · {% endunless %}<a href="/articles/tag/{{ t | slugify }}/">{{ t }}</a>{% endfor -%}
+  {%- endcapture %}
   {%- if terms != "" %}
   <p class="terms">{{ terms }}</p>
   {%- endif %}

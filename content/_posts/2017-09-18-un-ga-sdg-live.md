@@ -1,12 +1,16 @@
 ---
 source_id: post:2017-09-18-un-ga-sdg-live
 title: The Digital Transformation of Social Impact
+slug: the-digital-transformation-of-social-impact
 date: '2017-09-18'
 summary: I spoke at a panel at the 71st United Nations General Assembly, as part of the SDG Live event.
 categories:
 - Government
+- Technology
 tags:
 - Government
+- sdg
+- united nations
 banner: https://pbs.twimg.com/media/DKF6TfwUQAALTtY.jpg:large
 format: markdown
 wp_id: 67

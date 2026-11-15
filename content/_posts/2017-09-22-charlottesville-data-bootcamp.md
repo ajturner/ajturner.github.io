@@ -5,8 +5,11 @@ date: '2017-09-22'
 summary: It was my pleasure to present at the Charlottesville Data Bootcamp on September 22, 2017
 categories:
 - Government
+- Geo
+- Technology
 tags:
 - Government
+- open data
 banner: https://farm5.staticflickr.com/4388/36565206074_55fd4fa215_k_d.jpg
 format: markdown
 wp_id: 62
