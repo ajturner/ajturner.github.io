@@ -288,3 +288,21 @@ def test_voice_check_blocks_tk_placeholders(tmp_path):
     p.write_text(("Last week I was in Raleigh for the conference and talked with people about maps and data. " * 12)
                  + "\n\n[TK: who said it]\n")
     assert any("placeholder" in f for f in check(p).failures)
+
+
+def test_wordpress_article_urls_have_a_post_or_redirect():
+    """Every /articles/<slug>/ URL WordPress served maps to a post slug or a redirect."""
+    import re as _re
+    import yaml as _yaml
+    root = Path(__file__).resolve().parent.parent
+    urls = _yaml.safe_load((root / "_data/wordpress_urls.yml").read_text())["urls"]
+    redirects = {r["from"] for r in _yaml.safe_load((root / "_data/redirects.yml").read_text())}
+    slugs = set()
+    for path in (root / "content/_posts").iterdir():
+        front = _yaml.safe_load(path.read_text(encoding="utf-8").split("---")[1])
+        slugs.add(front.get("slug") or _re.sub(r"^\d{4}-\d{2}-\d{2}-", "", path.stem))
+    sections = ("category/", "tag/")
+    wanted = [u for u in urls if u.startswith("/articles/") and u != "/articles/" and not u[10:].startswith(sections)]
+    assert wanted, "no article URLs listed"
+    missing = [u for u in wanted if u[len("/articles/"):-1] not in slugs and u not in redirects]
+    assert not missing, missing

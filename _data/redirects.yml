@@ -1,0 +1,19 @@
+# Old URLs that now live elsewhere on this site. _plugins/redirects.rb writes a small
+# page at each `from` that sends browsers and search engines to `to`.
+#
+# WordPress gave five posts slugs ending in an invisible U+FFFC character, and those
+# were the addresses it linked and listed. They redirect to the clean URLs here.
+- from: "/articles/crisiscommons-and-congress￼/"
+  to: /articles/crisiscommons-and-congress/
+- from: "/articles/crisiscommons-at-harvard-and-sloan-foundation￼/"
+  to: /articles/crisiscommons-at-harvard-and-sloan-foundation/
+- from: "/articles/bike-the-district￼/"
+  to: /articles/bike-the-district/
+- from: "/articles/professional-civic-engineering￼/"
+  to: /articles/professional-civic-engineering/
+# WordPress called this post crisiscommons-receives-1-2m-funding. It keeps its own
+# slug here because newer posts (synced from Notion) link to it.
+- from: "/articles/crisiscommons-receives-1-2m-funding￼/"
+  to: /articles/crisiscommons-receives-funding-from-sloan-foundation/
+- from: /articles/crisiscommons-receives-1-2m-funding/
+  to: /articles/crisiscommons-receives-funding-from-sloan-foundation/

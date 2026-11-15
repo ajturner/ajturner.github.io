@@ -43,6 +43,8 @@ jobs:
           JEKYLL_ENV: production
       - name: Check internal links
         run: python3 scripts/ci/check_links.py _site "/${{ github.event.repository.name }}"
+      - name: Check that WordPress URLs still resolve
+        run: python3 scripts/ci/check_wordpress_urls.py _site
       - uses: actions/upload-artifact@v4
         with:
           name: site

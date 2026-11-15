@@ -118,6 +118,11 @@ a.out::after { content: "\2197"; display: inline-block; margin-left: 0.15em; fon
 .titles li { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 1rem; padding: 0.45rem 0; border-top: 1px solid var(--rule); }
 .titles time { font: 400 0.8125rem/1.6 var(--mono); color: var(--muted); }
 .jump { display: flex; flex-wrap: wrap; gap: 0.25rem 0.75rem; font: 400 0.875rem/1.6 var(--mono); }
+.terms a { color: var(--muted); }
+.terms a:hover { color: var(--accent); }
+.term-list { list-style: none; margin: 1.5rem 0 0; padding: 0; columns: 3 12rem; column-gap: 2rem; }
+.term-list li { break-inside: avoid; padding: 0.2rem 0; }
+.term-list span { font: 400 0.8125rem/1 var(--mono); color: var(--muted); }
 
 /* Item links under a project or talk */
 .item-links { display: flex; flex-wrap: wrap; gap: 0.35rem 1.25rem; font-size: 0.875rem; margin: 0.5rem 0 0; }
