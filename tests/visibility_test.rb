@@ -1,5 +1,5 @@
 # Runs HEO.visibility from _plugins/heo.rb against tests/visibility_cases.yml.
-# CI: bundle exec ruby tests/visibility_test.rb. Works without Jekyll installed too,
+# Run: ruby tests/visibility_test.rb (CI does the same). Needs no Jekyll or bundle,
 # since only the plain functions in heo.rb are exercised.
 require "minitest/autorun"
 require "yaml"
