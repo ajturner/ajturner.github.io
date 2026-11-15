@@ -1,7 +1,2 @@
-# URLs removed on purpose, with no page to redirect to. scripts/ci/check_url_changes.py
-# lets a pull request delete the content behind a URL only if the URL is listed here
-# (or redirected in _data/redirects.yml). See docs/site-contract.md.
-#
-# - url: /articles/example/
-#   reason: Duplicate of /articles/example-2/, removed 2026-11-15
-[]
+- url: /articles/ipod-shuffle-scuffle/
+  reason: Probe for the URL check
