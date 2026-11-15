@@ -306,3 +306,58 @@ def test_wordpress_article_urls_have_a_post_or_redirect():
     assert wanted, "no article URLs listed"
     missing = [u for u in wanted if u[len("/articles/"):-1] not in slugs and u not in redirects]
     assert not missing, missing
+
+
+def test_visibility_matches_shared_cases():
+    """scripts/heo/content.visibility agrees with tests/visibility_cases.yml, the same
+    cases _plugins/heo.rb is tested against in tests/visibility_test.rb."""
+    import yaml as _yaml
+    from scripts.heo.content import visibility
+    spec = _yaml.safe_load((Path(__file__).parent / "visibility_cases.yml").read_text())
+    d = spec["defaults"]
+    for c in spec["cases"]:
+        got = visibility(c["collection"], c["data"], staging=c["staging"],
+                         excluded_albums=frozenset(str(x) for x in d["excluded_albums"]), user=d["user"])
+        assert got == c["expect"], c["name"]
+
+
+def _url_check(tmp_path, base, head, retired=None, existing=()):
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    """Run scripts/ci/check_url_changes.py in a scratch repo layout."""
+    import shutil
+    root = Path(__file__).resolve().parent.parent
+    (tmp_path / "_data").mkdir()
+    if retired is not None:
+        import yaml as _yaml
+        (tmp_path / "_data/retired_urls.yml").write_text(_yaml.safe_dump(retired))
+    for rel in existing:
+        (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
+        (tmp_path / rel).write_text("x")
+    (tmp_path / "base.json").write_text(json.dumps(base))
+    (tmp_path / "head.json").write_text(json.dumps(head))
+    shutil.copy(root / "scripts/ci/check_url_changes.py", tmp_path / "check.py")
+    import os, sys
+    env = {k: v for k, v in os.environ.items() if k != "GITHUB_STEP_SUMMARY"}
+    return subprocess.run([sys.executable, "check.py", "base.json", "head.json"], cwd=tmp_path,
+                          capture_output=True, text=True, env=env)
+
+
+def test_url_check_rules(tmp_path):
+    post = "content/_posts/2020-01-01-a.md"
+    # Unchanged and added URLs pass.
+    r = _url_check(tmp_path / "1", {"/a/": post}, {"/a/": post, "/b/": None}, existing=[post])
+    assert r.returncode == 0, r.stdout
+    # A moved URL fails.
+    r = _url_check(tmp_path / "2", {"/a/": post}, {"/a2/": post}, existing=[post])
+    assert r.returncode == 1 and "now builds at /a2/" in r.stdout
+    # A URL whose source still exists but builds nowhere (hidden) is a decision.
+    r = _url_check(tmp_path / "3", {"/a/": post}, {}, existing=[post])
+    assert r.returncode == 0 and "no longer built" in r.stdout
+    # A deleted source fails unless the URL is retired.
+    r = _url_check(tmp_path / "4", {"/a/": post}, {})
+    assert r.returncode == 1 and "was removed" in r.stdout
+    r = _url_check(tmp_path / "5", {"/a/": post}, {}, retired=[{"url": "/a/", "reason": "dup"}])
+    assert r.returncode == 0
+    # Generated pages only report.
+    r = _url_check(tmp_path / "6", {"/articles/tag/x/": None}, {})
+    assert r.returncode == 0

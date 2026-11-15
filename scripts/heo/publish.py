@@ -23,7 +23,7 @@ from pathlib import Path
 
 import markdown
 
-from .content import CONTENT, ROOT, Item, iter_items, load, portfolio_excluded
+from .content import CONTENT, ROOT, Item, excluded_album_ids, iter_items, load, visibility
 from .http import check, require_env, session
 
 TYPE_FIELDS = {
@@ -60,7 +60,9 @@ def payload(item: Item, new_status: str) -> dict:
         "content": render_body(item),
         "excerpt": m.get("summary", ""),
         "date": str(m["date"]) if m.get("date") else None,
-        "hidden": bool(m.get("hidden", False)) or portfolio_excluded(m),
+        # Same rule as the static site (content.visibility); WordPress has no drafts view.
+        "hidden": visibility(item.folder.lstrip("_"), m, staging=False,
+                             excluded_albums=excluded_album_ids()) != "shown",
         "new_status": new_status,
         "tags": m.get("tags", []),
         "meta": meta,

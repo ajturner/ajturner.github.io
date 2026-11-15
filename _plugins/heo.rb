@@ -25,24 +25,39 @@ module HEO
         # which Jekyll's own doc.url would shadow in templates.
         collection.docs.each { |doc| doc.data["href"] = doc.data["url"] } if name == "external"
         collection.docs.reject! do |doc|
-          hidden = doc.data["hidden"] == true
-          if name == "photos"
-            hidden || excluded.include?(doc.data["flickr_id"].to_s)
-          elsif name == "projects" && HEO.portfolio_excluded?(doc, user)
-            true
-          else
-            doc.data["draft_badge"] = true if hidden
-            hidden && !staging
-          end
+          result = HEO.visibility(name, doc.data, staging: staging, excluded_albums: excluded, user: user)
+          doc.data["draft_badge"] = true if result == "draft"
+          result == "dropped"
         end
       end
     end
   end
 
+  # The visibility rule, shared with scripts/heo/content.py `visibility`. Both must
+  # agree with every case in tests/visibility_cases.yml (see docs/site-contract.md).
+  # Returns "shown", "draft" (built with a Draft badge, staging only) or "dropped".
+  def self.visibility(collection, data, staging:, excluded_albums:, user:)
+    hidden = data["hidden"] == true
+    if collection == "photos"
+      hidden || excluded_albums.include?(data["flickr_id"].to_s) ? "dropped" : "shown"
+    elsif collection == "projects" && portfolio_excluded_data?(data, user)
+      "dropped"
+    elsif hidden
+      staging ? "draft" : "dropped"
+    else
+      "shown"
+    end
+  end
+
   def self.portfolio_excluded?(doc, user)
-    owner = doc.data["github"].to_s.split("/").first.to_s.downcase
+    portfolio_excluded_data?(doc.data, user)
+  end
+
+  def self.portfolio_excluded_data?(data, user)
+    user = user.to_s.downcase
+    owner = data["github"].to_s.split("/").first.to_s.downcase
     return false if user.empty? || owner != user
-    topics = Array((doc.data["synced"] || {})["topics"]).map { |t| t.to_s.downcase }
+    topics = Array((data["synced"] || {})["topics"]).map { |t| t.to_s.downcase }
     !topics.include?("portfolio")
   end
 

@@ -138,3 +138,27 @@ def portfolio_excluded(meta: dict, user: str = GITHUB_USER) -> bool:
     topics = [str(t).lower() for t in (meta.get("synced") or {}).get("topics") or []]
     return PORTFOLIO_TOPIC not in topics
 
+
+def visibility(collection: str, meta: dict, *, staging: bool, excluded_albums: set[str] | frozenset[str] = frozenset(),
+               user: str = GITHUB_USER) -> str:
+    """The visibility rule, shared with _plugins/heo.rb `HEO.visibility`. Both must agree
+    with every case in tests/visibility_cases.yml (see docs/site-contract.md).
+
+    `collection` is the Jekyll collection name (posts, external, talks, projects, photos).
+    Returns "shown", "draft" (built with a Draft badge, staging only) or "dropped"."""
+    hidden = meta.get("hidden") is True
+    if collection == "photos":
+        return "dropped" if hidden or str(meta.get("flickr_id")) in excluded_albums else "shown"
+    if collection == "projects" and portfolio_excluded(meta, user):
+        return "dropped"
+    if hidden:
+        return "draft" if staging else "dropped"
+    return "shown"
+
+
+def excluded_album_ids() -> frozenset[str]:
+    """Flickr album IDs in _data/flickr_exclude.yml, which are never shown."""
+    path = ROOT / "_data" / "flickr_exclude.yml"
+    data = yaml.safe_load(path.read_text()) if path.exists() else None
+    return frozenset(str(a["id"]) for a in (data or {}).get("albums") or [])
+

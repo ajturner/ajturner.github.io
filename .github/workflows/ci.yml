@@ -37,14 +37,35 @@ jobs:
         with:
           ruby-version: "3.3"
           bundler-cache: true
+      - name: Visibility rule matches the shared cases
+        # Plain ruby: the test stubs Jekyll, and minitest is not in the bundle.
+        run: ruby tests/visibility_test.rb
       - name: Build the site as GitHub Pages serves it
         run: bundle exec jekyll build --strict_front_matter --baseurl "/${{ github.event.repository.name }}"
         env:
           JEKYLL_ENV: production
+          HEO_URL_MANIFEST: ${{ runner.temp }}/head-urls.json
       - name: Check internal links
         run: python3 scripts/ci/check_links.py _site "/${{ github.event.repository.name }}"
       - name: Check that WordPress URLs still resolve
         run: python3 scripts/ci/check_wordpress_urls.py _site
+      # docs/site-contract.md: a URL may only disappear by a visibility decision, a
+      # redirect, or an entry in _data/retired_urls.yml.
+      - name: Build the base branch for the URL check
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: |
+          git fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
+          git worktree add "$RUNNER_TEMP/base" FETCH_HEAD
+          cd "$RUNNER_TEMP/base"
+          bundle exec jekyll build --baseurl "/${{ github.event.repository.name }}" -d "$RUNNER_TEMP/base-site"
+        env:
+          JEKYLL_ENV: production
+          BUNDLE_GEMFILE: ${{ github.workspace }}/Gemfile
+          HEO_URL_MANIFEST: ${{ runner.temp }}/base-urls.json
+      - name: Check that no URL disappeared
+        if: github.event_name == 'pull_request'
+        run: python3 scripts/ci/check_url_changes.py "$RUNNER_TEMP/base-urls.json" "$RUNNER_TEMP/head-urls.json"
       - uses: actions/upload-artifact@v4
         with:
           name: site
