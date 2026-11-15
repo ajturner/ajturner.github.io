@@ -1,0 +1,20 @@
+---
+layout: default
+---
+{%- comment -%} One category or tag. Pages come from _plugins/terms.rb. {%- endcomment -%}
+{%- assign posts = page.term_posts -%}
+{%- assign years = posts | group_by_exp: "w", "w.date | date: '%Y'" -%}
+<div class="narrow">
+  {% include crumbs.html %}
+  <p class="kicker">{{ page.term_kind }} · <a href="{{ page.term_index }}">{{ page.term_index_label }}</a></p>
+  <h1>{{ page.title }}</h1>
+  <p class="lede">{% if posts.size == 1 %}1 article{% else %}{{ posts.size }} articles{% endif %}, newest first.</p>
+  {%- for y in years %}
+  <h2 class="year">{{ y.name }}</h2>
+  <ul class="titles">
+    {%- for w in y.items %}
+    <li><time datetime="{{ w.date | date_to_xmlschema }}">{{ w.date | date: "%b %-d" }}</time><span><a href="{{ w.url }}">{{ w.title }}</a>{% if w.draft_badge %}<span class="badge">Draft</span>{% endif %}</span></li>
+    {%- endfor %}
+  </ul>
+  {%- endfor %}
+</div>

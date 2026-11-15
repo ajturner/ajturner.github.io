@@ -1,0 +1,24 @@
+---
+layout: null
+permalink: /feed/
+sitemap: false
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  {%- comment -%}
+  WordPress served the article feed at /feed/. GitHub Pages only serves index.html
+  for a folder, so this page points feed readers and browsers at /feed.xml. The
+  URLs are relative so they work under a base path too.
+  {%- endcomment %}
+  <title>Feed moved · {{ site.title }}</title>
+  <meta name="robots" content="noindex">
+  <meta http-equiv="refresh" content="0; url=../feed.xml">
+  <link rel="alternate" type="application/atom+xml" title="{{ site.title }}" href="../feed.xml">
+  <link rel="canonical" href="{{ site.url }}/feed.xml">
+</head>
+<body>
+  <p>The feed for {{ site.title }} is at <a href="../feed.xml">{{ site.url }}/feed.xml</a>.</p>
+</body>
+</html>
