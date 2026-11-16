@@ -10,11 +10,11 @@ featured: true
 synced:
   pages_url: ''
   description: Transform, query, and download geospatial data on the web.
-  stars: 715
+  stars: 716
   forks: 134
   language: JavaScript
   homepage: http://koopjs.github.io
-  pushed_at: '2026-11-09'
+  pushed_at: '2026-11-16'
   topics:
   - api
   - arcgis

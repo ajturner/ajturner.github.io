@@ -12,7 +12,7 @@ summary: Open-source JavaScript library with one developer interface over more t
 synced:
   pages_url: https://mapstraction.github.io/mxn/
   description: A Javascript Mapping Abstraction library.
-  stars: 581
+  stars: 582
   forks: 128
   language: JavaScript
   homepage: http://mapstraction.com/
