@@ -11,7 +11,7 @@ summary: 'Fold a pocket-sized map booklet from any ArcGIS feature layer or GeoJS
 synced:
   pages_url: https://ajturner.github.io/pocketmaps/
   description: Ruby library to generate PocketMods and PocketMaps - small foldable paper booklets
-  stars: 15
+  stars: 16
   forks: 1
   language: JavaScript
   homepage: http://ajturner.github.io/pocketmaps/
